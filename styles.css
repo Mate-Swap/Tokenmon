@@ -1,0 +1,868 @@
+/* Global reset and basic body styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Press Start 2P', cursive;
+    background-color: #2c2c2c; /* Dark grey background */
+    color: #fff; /* White text */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden; /* Prevent scrollbars on body */
+}
+
+/* Main game container styling */
+#game-container {
+    border: 5px solid #888; /* Grey border */
+    background-color: #000; /* Black background for the container */
+    width: 800px; /* Fixed width */
+    height: 600px; /* Fixed height */
+    position: relative; /* Needed for absolute positioning of views */
+    overflow: hidden; /* Hide anything outside the container */
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3); /* White glow effect */
+    border-radius: 10px; /* Rounded corners */
+}
+
+/* Base styling for all game views */
+.game-view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none; /* Hide views by default */
+    flex-direction: column; /* Arrange content vertically */
+    justify-content: center; /* Center content vertically */
+    align-items: center; /* Center content horizontally */
+    background-color: #000; /* Default black background for views */
+    z-index: 1; /* Base stacking order */
+    padding: 15px; /* Padding within views */
+}
+
+/* Style for the currently active view */
+.game-view.active {
+    display: flex; /* Show the active view using flexbox */
+    z-index: 10; /* Ensure active view is on top */
+}
+
+/* Specific styles for Exploration View */
+#exploration-view {
+    justify-content: flex-start; /* Align content to the top */
+    padding: 0; /* Remove padding to allow canvas to fill */
+}
+/* --- NEW --- Added slightly off-black background to test visibility */
+#exploration-view.active {
+    background-color: #111; /* Slightly off-black to test visibility */
+}
+
+
+#exploration-canvas {
+    border: 3px solid #0f380f; /* Dark green border like old consoles */
+    border-radius: 5px;
+    display: block; /* Remove extra space below canvas */
+    image-rendering: pixelated; /* Keep pixel art sharp */
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    margin: auto; /* Center canvas if container is larger */
+    /* Canvas width/height set in HTML */
+    /* --- NEW --- Added distinct background to canvas */
+    background-color: #223322; /* Dark green, distinct from black/off-black */
+}
+
+#exploration-ui-top {
+    position: absolute; /* Position over the canvas */
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 20; /* Ensure UI is above canvas */
+    pointer-events: none; /* Allow clicks to pass through the container */
+}
+
+#exploration-stats {
+    background: rgba(0,0,0,0.6); /* Semi-transparent black background */
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc; /* Light grey border */
+    font-size: 10px; /* Small font size */
+    line-height: 1.4;
+    pointer-events: auto; /* Make stats clickable if needed */
+}
+
+#exploration-stats span {
+    margin-right: 10px; /* Spacing between stats */
+}
+
+#exploration-controls {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+    pointer-events: auto; /* Make controls clickable */
+}
+
+/* Renamed #open-inventory-button to #open-wallet-button */
+#open-wallet-button {
+    padding: 8px 12px;
+    font-size: 10px;
+    background-color: #0074D9; /* Blue background */
+    color: white;
+    border: 2px solid #7FDBFF; /* Lighter blue border */
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 3px #001f3f; /* Simple 3D effect */
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+#open-wallet-button:hover {
+    background-color: #005073; /* Darker blue on hover */
+}
+
+#open-wallet-button:active {
+    transform: translateY(1px); /* Press down effect */
+    box-shadow: 0 2px #001f3f;
+}
+
+/* Wallet Connect Section Styling */
+#wallet-section {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between button and address */
+    background: rgba(0,0,0,0.6); /* Match stats background */
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc; /* Match stats border */
+    pointer-events: auto; /* Make clickable */
+}
+
+#connect-wallet-button {
+    padding: 6px 10px;
+    font-size: 10px;
+    background-color: #9945FF; /* Purple background */
+    color: white;
+    border: 2px solid #C398FF; /* Lighter purple border */
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 2px #5A00B3; /* Darker purple shadow */
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+#connect-wallet-button:hover {
+    background-color: #7A1FFF; /* Brighter purple on hover */
+}
+
+#connect-wallet-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px #5A00B3;
+}
+
+#wallet-address-display {
+    font-size: 10px;
+    color: #C398FF; /* Lighter purple text */
+    background-color: rgba(255, 255, 255, 0.1); /* Subtle background */
+    padding: 3px 6px;
+    border-radius: 3px;
+}
+
+/* Map Title Styling */
+#map-title {
+    position: absolute;
+    top: 50px; /* Position below the top UI */
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 18px;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    z-index: 15; /* Below top UI but above canvas potentially */
+    background: rgba(0,0,0,0.5);
+    padding: 5px 15px;
+    border-radius: 5px;
+}
+
+
+/* Specific styles for Battle View */
+#battle-view {
+    /* background-image is set dynamically via JavaScript */
+    background-size: cover;
+    background-repeat: no-repeat;
+    justify-content: flex-end; /* Align menu to the bottom */
+    padding: 15px;
+    transition: background 0.5s ease; /* Smooth background transitions */
+    /* The background-image will be updated dynamically using JavaScript */
+}
+
+/* Background variations for different battle terrains */
+#battle-view.battle-bg-grass { background: linear-gradient(to bottom, #6a9f36, #9bbc0f); }
+#battle-view.battle-bg-path { background: linear-gradient(to bottom, #b09870, #e0c8a0); }
+#battle-view.battle-bg-water { background: linear-gradient(to bottom, #307dca, #509add); }
+#battle-view.battle-bg-mountain { background: linear-gradient(to bottom, #606060, #909090); }
+#battle-view.battle-bg-house { background: linear-gradient(to bottom, #80320d, #a0522d); }
+
+#battle-timer {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%); /* Center horizontally */
+    background-color: rgba(0,0,0,0.7);
+    color: #FFCC00; /* Yellow timer text */
+    padding: 5px 15px;
+    border-radius: 15px; /* Pill shape */
+    font-size: 16px;
+    border: 2px solid #FFCC00;
+    z-index: 15; /* Above monster displays */
+}
+
+#battle-area {
+    position: absolute;
+    top: 50px; /* Below the timer */
+    left: 0;
+    width: 100%;
+    height: calc(100% - 250px); /* Area for monsters above the menu */
+    /* background: rgba(255, 0, 0, 0.1); */ /* Optional: for visualizing the area */
+}
+
+.monster-display {
+    width: 170px; /* Fixed width */
+    min-height: 140px; /* Minimum height */
+    border: 4px solid #fff; /* Default white border */
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Space out elements vertically */
+    align-items: center; /* Center horizontally */
+    text-align: center;
+    font-size: 10px; /* Base font size */
+    padding: 8px;
+    position: absolute; /* Position within battle-area */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Drop shadow */
+}
+
+#player-monster-display {
+    bottom: 10%; /* Position player's monster */
+    left: 5%;
+    border-color: #7FDBFF; /* Light blue border for player */
+}
+
+#opponent-monster-display {
+    top: 10%; /* Position opponent's monster */
+    right: 5%;
+    border-color: #FF4136; /* Red border for opponent */
+}
+
+.monster-display .avatar {
+    font-size: 48px; /* Large avatar/emoji */
+    margin: 5px 0;
+    line-height: 1;
+}
+
+.monster-display .name {
+    font-size: 14px;
+    margin-bottom: 3px;
+    font-weight: bold;
+}
+
+.monster-display .type {
+    font-size: 11px;
+    margin-bottom: 5px;
+    color: #ccc; /* Lighter text for type */
+}
+
+.monster-display .hp-bar-container {
+    background-color: #555; /* Dark background for HP bar */
+    height: 12px;
+    width: 90%; /* Relative width */
+    border-radius: 4px;
+    overflow: hidden; /* Hide inner bar overflow */
+    border: 1px solid #111; /* Dark border */
+    margin-bottom: 3px;
+}
+
+.monster-display .hp-bar-inner {
+    background: linear-gradient(to bottom, #76ff03, #5aab00); /* Green gradient for HP */
+    height: 100%;
+    width: 100%; /* Controlled by JS */
+    border-radius: 3px;
+    transition: width 0.5s ease; /* Animate HP changes */
+}
+
+.monster-display .hp-text {
+    font-size: 11px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+#player-ap-display {
+    font-size: 12px;
+    font-weight: bold;
+    color: #00FFFF; /* Cyan color for AP */
+    margin-top: 4px;
+}
+
+/* Battle Menu Styling */
+#battle-menu-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute; /* Position at the bottom */
+    bottom: 15px;
+    left: 0;
+}
+
+#message-log {
+    width: 90%;
+    max-width: 600px;
+    height: 50px; /* Fixed height */
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 12px;
+    line-height: 1.4;
+    overflow-y: auto; /* Scroll if messages overflow */
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+#battle-menu {
+    width: 95%;
+    max-width: 650px;
+    height: auto;
+    min-height: 100px; /* Minimum height */
+    background-color: #001f3f; /* Dark blue background */
+    border: 4px solid #7fdbff; /* Light blue border */
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); /* Responsive grid */
+    gap: 10px;
+    padding: 15px;
+    align-items: center; /* Center items vertically in grid cells */
+    justify-items: center; /* Center items horizontally */
+}
+
+/* Submenu for actions like specific attacks */
+#action-submenu {
+    grid-column: 1 / -1; /* Span all columns */
+    display: none; /* Hidden by default */
+    flex-wrap: wrap; /* Wrap buttons if needed */
+    justify-content: center;
+    gap: 8px;
+    margin-top: 5px;
+    padding: 10px;
+    background-color: rgba(0, 31, 63, 0.8); /* Slightly transparent background */
+    border-radius: 5px;
+}
+
+#action-submenu.visible {
+    display: flex; /* Show when needed */
+}
+
+/* Styling for buttons within the action submenu */
+.action-button {
+    background-color: #FF851B; /* Orange background */
+    color: #fff;
+    border: 2px solid #FFB700; /* Yellow border */
+    padding: 8px 12px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 11px;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 5px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 3px #c15700; /* Orange shadow */
+    flex-grow: 1; /* Allow buttons to grow */
+    min-width: 100px; /* Minimum width */
+}
+
+.action-button:hover {
+    background-color: #ff9d3a; /* Lighter orange on hover */
+}
+
+.action-button:active {
+    background-color: #e07000; /* Darker orange when pressed */
+    transform: translateY(1px);
+    box-shadow: 0 2px #c15700;
+}
+
+/* General styling for main battle menu buttons */
+.battle-button {
+    background-color: #0074D9; /* Blue background */
+    color: #fff;
+    border: 2px solid #7FDBFF; /* Light blue border */
+    padding: 10px 5px; /* Padding */
+    font-family: 'Press Start 2P', cursive;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 5px;
+    width: 100%; /* Fill grid cell */
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 4px #001f3f; /* Dark blue shadow */
+}
+
+/* Specific styling for the Switch button */
+#switch-button {
+    background-color: #2ECC40; /* Green background */
+    border-color: #5aab00; /* Darker green border */
+    box-shadow: 0 4px #1a6a20; /* Dark green shadow */
+}
+#switch-button:hover { background-color: #48d85b; }
+#switch-button:active {
+    background-color: #1a9a2a;
+    box-shadow: 0 2px #1a6a20;
+    transform: translateY(2px); /* Consistent press effect */
+}
+
+
+.battle-button:hover {
+    background-color: #005073; /* Darker blue on hover */
+}
+
+.battle-button:active {
+    background-color: #003050; /* Even darker blue when pressed */
+    transform: translateY(2px); /* Press down effect */
+    box-shadow: 0 2px #001f3f; /* Smaller shadow when pressed */
+}
+
+/* Capture View Styling */
+#capture-view {
+    background-color: rgba(0, 0, 0, 0.8); /* Dark semi-transparent background */
+    padding: 20px;
+    border-radius: 10px;
+    display: flex; /* Already default for .game-view.active */
+    flex-direction: column;
+    align-items: center;
+    gap: 15px; /* Space between elements */
+}
+
+#capture-view h2 { margin-bottom: 10px; }
+#capture-view p { margin-bottom: 5px; }
+
+.capture-net-button {
+    background-color: #4CAF50; /* Green background */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    font-family: 'Press Start 2P', cursive;
+    cursor: pointer;
+    border-radius: 5px;
+    min-width: 180px; /* Minimum width */
+    transition: background-color 0.3s;
+}
+
+.capture-net-button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+#cancel-capture-button {
+    background-color: #f44336; /* Red background */
+    margin-top: 10px;
+}
+
+#cancel-capture-button:hover {
+    background-color: #da190b; /* Darker red on hover */
+}
+
+/* Wallet View (formerly Inventory) & Switch Monster View Styling */
+#wallet-view, #switch-monster-view { /* Updated ID */
+    background-color: rgba(0, 0, 0, 0.9); /* Very dark background */
+    padding: 20px;
+    border-radius: 10px;
+    color: #fff;
+    align-items: flex-start; /* Align content to top-left */
+    overflow-y: auto; /* Allow scrolling if content overflows */
+    width: 90%; /* Take up most of the container width */
+    max-width: 700px; /* Max width */
+    height: 80%; /* Take up most of the container height */
+    max-height: 500px; /* Max height */
+    justify-content: flex-start; /* Override default center */
+}
+
+/* Updated Header ID */
+#wallet-header {
+    width: 100%;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #555; /* Separator line */
+    display: flex;
+    justify-content: space-around; /* Space out elements */
+    align-items: center;
+    flex-wrap: wrap; /* Wrap if space is limited */
+    gap: 10px;
+}
+
+/* Updated Money Span ID */
+#wallet-money {
+    font-size: 12px;
+    color: #FFDC00; /* Yellow for money */
+}
+
+/* Updated Action Button Class */
+.wallet-action-button {
+    background-color: #FF851B; /* Orange */
+    color: white;
+    border: 1px solid #FFB700; /* Yellow border */
+    padding: 5px 8px;
+    font-size: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.wallet-action-button:hover {
+    background-color: #ff9d3a; /* Lighter orange on hover */
+}
+
+/* NEW: Wallet Columns Layout */
+.wallet-columns {
+    display: flex;
+    width: 100%;
+    gap: 20px; /* Space between columns */
+}
+
+.wallet-column {
+    flex: 1; /* Each column takes equal space */
+    background-color: rgba(255, 255, 255, 0.05); /* Slight background for columns */
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #333;
+}
+
+.wallet-column h3 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: #FFCC00;
+    border-bottom: 1px solid #555;
+    padding-bottom: 5px;
+}
+
+/* Styling for lists in Wallet and Switch views */
+/* Updated List IDs */
+#wallet-monster-list, #wallet-item-list, #switch-monster-list {
+    list-style: none; /* Remove default bullet points */
+    padding: 0;
+    width: 100%;
+    max-height: 250px; /* Limit height for scrolling */
+    overflow-y: auto; /* Enable scrolling */
+}
+
+/* Updated List Item Styling */
+#wallet-monster-list li, #wallet-item-list li, #switch-monster-list li {
+    background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent white */
+    border: 1px solid #555;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 11px; /* Slightly smaller font */
+    cursor: default; /* Default cursor */
+    line-height: 1.4;
+}
+
+#wallet-item-list li {
+    font-size: 12px; /* Slightly larger for items */
+}
+
+#switch-monster-list li {
+    cursor: pointer; /* Pointer cursor for switch list */
+    transition: background-color 0.2s ease;
+}
+
+#switch-monster-list li:hover {
+    background-color: rgba(0, 116, 217, 0.3); /* Blue highlight on hover */
+}
+
+/* Styling for disabled/fainted monsters in switch list */
+#switch-monster-list li.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    background-color: rgba(100, 100, 100, 0.2); /* Greyed out */
+}
+
+/* Styling for the currently active monster in switch list */
+#switch-monster-list li.active-monster {
+    border-color: #FFDC00; /* Yellow border for active monster */
+    font-weight: bold;
+}
+
+/* Close/Cancel buttons for modal-like views */
+/* Updated Close Button ID */
+#close-wallet-button, #cancel-switch-button {
+    position: absolute; /* Position relative to the view */
+    top: 15px;
+    right: 15px;
+    background-color: #f44336; /* Red */
+    color: white;
+    border: none;
+    border-radius: 50%; /* Circular button */
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 30px; /* Center 'X' vertically */
+    text-align: center;
+    z-index: 15; /* Ensure button is clickable */
+}
+
+/* Utility class to force hiding an element */
+.hidden {
+    display: none !important; /* Override other display properties */
+}
+
+/* Monster Selection Screen Styles */
+#monster-selection-view {
+    background: linear-gradient(to bottom, #3a3a3a, #1a1a1a); /* Dark gradient background */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#monster-selection-view h2 {
+    margin-bottom: 30px;
+    font-size: 24px;
+    color: #FFCC00; /* Yellow title */
+    text-shadow: 2px 2px #000;
+}
+
+.monster-options {
+    display: flex;
+    justify-content: space-around; /* Space out the options */
+    align-items: center;
+    width: 90%;
+    max-width: 700px;
+}
+
+.monster-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 2px solid #888;
+    border-radius: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.monster-option:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+}
+
+.monster-option img {
+    width: 80px; /* Adjust size as needed */
+    height: 80px; /* Adjust size as needed */
+    margin-bottom: 15px;
+    image-rendering: pixelated; /* Keep pixel art sharp */
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+.monster-option button {
+    padding: 8px 15px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px;
+    background-color: #4CAF50; /* Green button */
+    color: white;
+    border: 2px solid #81C784; /* Lighter green border */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    box-shadow: 0 3px #2e7d32; /* Darker green shadow */
+}
+
+.monster-option button:hover {
+    background-color: #66BB6A; /* Lighter green on hover */
+}
+
+.monster-option button:active {
+    background-color: #388E3C; /* Even darker green when pressed */
+    transform: translateY(1px);
+    box-shadow: 0 2px #2e7d32;
+}
+
+ /* News Reel Banner Styles */
+ #news-reel-banner {
+     position: absolute;
+     bottom: 10px;
+     right: 10px;
+     width: 300px; /* Increased width further */
+     height: 42px; /* Adjusted height to fit text potentially */
+     background-color: rgba(50, 50, 50, 0.8); /* Dark semi-transparent background */
+    border: 2px solid #aaa;
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
+    z-index: 25; /* Above other UI elements */
+    transition: background-color 0.2s;
+    display: flex; /* Use flexbox for layout */
+    align-items: center; /* Center items vertically */
+    overflow: hidden; /* Hide overflowing text */
+}
+
+#news-reel-banner:hover {
+    background-color: rgba(80, 80, 80, 0.9); /* Lighter on hover */
+ }
+
+ #news-reel-banner img {
+     width: 80px; /* Increased width by 25% (64 * 1.25 = 80) */
+     height: 32px; /* Keep height the same */
+     /* display: block; */ /* Removed display block */
+     image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+     margin-right: 8px; /* Add space between icon and text */
+     flex-shrink: 0; /* Prevent icon from shrinking */
+ }
+
+ #news-reel-banner span {
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     font-size: 11px;
+     color: #eee; /* Light grey text */
+     flex-grow: 1; /* Allow text to take up remaining space */
+ }
+
+/* News Modal Styles */
+#news-modal {
+    background-color: rgba(0, 0, 0, 0.9); /* Very dark background */
+    padding: 20px;
+    border-radius: 10px;
+    color: #fff;
+    align-items: flex-start; /* Align content to top-left */
+    overflow-y: auto; /* Allow scrolling if content overflows */
+    width: 80%; /* Take up most of the container width */
+    max-width: 600px; /* Max width */
+    height: 70%; /* Take up most of the container height */
+    max-height: 450px; /* Max height */
+    justify-content: flex-start; /* Override default center */
+    z-index: 30; /* Ensure it's above other views */
+}
+
+#news-modal h2 {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #FFCC00; /* Yellow title */
+}
+
+#news-list {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+#news-list li {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+#news-list li .news-effect {
+    font-weight: bold;
+    margin-top: 5px;
+    display: block;
+}
+
+#news-list li .news-effect.positive {
+    color: #76ff03; /* Green for positive effects */
+}
+
+#news-list li .news-effect.negative {
+    color: #ff4136; /* Red for negative effects */
+}
+
+#close-news-modal-button {
+    /* Use similar styling to other close buttons */
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #f44336; /* Red */
+    color: white;
+    border: none;
+    border-radius: 50%; /* Circular button */
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 30px; /* Center 'X' vertically */
+    text-align: center;
+    z-index: 35; /* Above modal content */
+}
+
+/* News Alert Overlay Styles */
+#news-alert-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent dark background */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 100; /* Highest z-index */
+    text-align: center;
+    pointer-events: none; /* Allow clicks to pass through */
+}
+
+#news-alert-overlay.hidden {
+    display: none;
+}
+
+#news-alert-overlay img {
+    width: 128px; /* Adjust size as needed */
+    height: 128px;
+    margin-bottom: 20px;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    animation: vibrate 0.3s linear infinite both; /* Add vibration */
+}
+
+#news-alert-overlay p {
+    font-size: 18px;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    max-width: 80%;
+}
+
+#news-alert-overlay p.positive {
+    color: #76ff03; /* Green */
+    border-color: #76ff03;
+}
+
+#news-alert-overlay p.negative {
+    color: #ff4136; /* Red */
+    border-color: #ff4136;
+}
+
+/* Vibration Animation */
+@keyframes vibrate {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}

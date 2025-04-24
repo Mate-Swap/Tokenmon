@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Monster Battler</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Solana Wallet Adapter and Web3 JS -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
+    <script src="https://unpkg.com/@solana/wallet-adapter-base@latest/lib/index.iife.js"></script>
+    <script src="https://unpkg.com/@solana/wallet-adapter-wallets@latest/lib/index.iife.js"></script>
+    <script>
+        // Make exports available globally for script.js
+        window.solanaWeb3 = solanaWeb3;
+        window.solanaWalletAdapterBase = solanaWalletAdapterBase;
+        window.solanaWalletAdapterWallets = solanaWalletAdapterWallets;
+    </script>
+</head>
+<body>
+    <div id="game-container">
+        <div id="monster-selection-view" class="game-view active">
+            <h2>Choose your first Tokenmon!</h2>
+            <div class="monster-options">
+                <div class="monster-option" data-monster="BitcoinMon">
+                    <img src="Textures/bitcoinmon.png" alt="BitcoinMon">
+                    <button>Choose BitcoinMon</button>
+                </div>
+                <div class="monster-option" data-monster="AppleMon">
+                    <img src="Textures/apple.png" alt="AppleMon">
+                    <button>Choose AppleMon</button>
+                </div>
+                <div class="monster-option" data-monster="USTBill">
+                    <img src="Textures/TBill.png" alt="USTBill">
+                    <button>Choose USTBill</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="exploration-view" class="game-view">
+             <div id="exploration-ui-top">
+                 <div id="exploration-stats">
+                     <span id="exploration-ap-display">AP: 10/10</span>
+                     <span id="exploration-monster-count">Monsters: 0/3</span>
+                     <span id="exploration-level-display">Lv: 1</span>
+                     <span id="exploration-money-display">💰: 1000</span>
+                 </div>
+                 <div id="exploration-controls">
+                    <button id="open-wallet-button">Wallet</button> <!-- Renamed button -->
+                    <div id="wallet-section">
+                        <button id="connect-wallet-button">Connect Wallet</button>
+                        <span id="wallet-address-display" style="display: none;"></span>
+                    </div>
+                  </div>
+              </div>
+             <h1 id="map-title">Trading valley</h1>
+             <canvas id="exploration-canvas" width="800" height="600"></canvas>
+              <p style="position: absolute; bottom: 10px; left: 10px; font-size: 10px; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 3px;">Use Arrow Keys to Move</p>
+              <!-- News Reel Banner -->
+              <div id="news-reel-banner">
+                  <img src="Textures/reporter.png" alt="News">
+                  <span id="news-reel-text"></span> <!-- Added span for news text -->
+                  <span id="news-summary"></span>
+              </div>
+          </div>
+
+        <div id="battle-view" class="game-view">
+             <div id="battle-timer">Time: 30</div>
+            <div id="battle-area">
+                 <div id="opponent-monster-display" class="monster-display">
+                     <div class="avatar">❓</div> <div class="name">Opponent</div>
+                     <div class="type">Type: ???</div>
+                     <div class="hp-bar-container"><div class="hp-bar-inner" style="width: 100%;"></div></div>
+                     <div class="hp-text">HP: 100/100</div>
+                 </div>
+                <div id="player-monster-display" class="monster-display">
+                     <div class="avatar">❓</div> <div class="name">Your Monster</div>
+                     <div class="type">Type: ???</div>
+                     <div class="hp-bar-container"><div class="hp-bar-inner" style="width: 100%;"></div></div>
+                     <div class="hp-text">HP: 100/100</div>
+                     <div id="player-ap-display">AP: 10/10</div>
+                 </div>
+            </div>
+            <div id="battle-menu-container">
+                 <div id="message-log">Battle Starts!</div>
+                 <div id="battle-menu">
+                    <button class="battle-button" id="attack-button">Attack</button>
+                    <button class="battle-button" id="defend-button">Defend</button>
+                    <button class="battle-button" id="switch-button">Switch</button>
+                    <button class="battle-button" id="item-button">Items</button>
+                    <button class="battle-button" id="capture-button">Capture</button>
+                    <button class="battle-button" id="run-button">Run</button>
+                    <div id="action-submenu"></div>
+                 </div>
+            </div>
+        </div>
+
+         <div id="capture-view" class="game-view">
+             <h2 id="capture-target-name">Capture Monster?</h2> <p>Select Wallet Catcher:</p>
+             <button class="capture-wallet-button" data-wallet-type="Gold Wallet Catcher">💰💾 Gold Catcher (+1% Bonus)</button>
+             <button class="capture-wallet-button" data-wallet-type="Silver Wallet Catcher">🥈💾 Silver Catcher (+2% Bonus)</button>
+             <button class="capture-wallet-button" data-wallet-type="Copper Wallet Catcher">🥉💾 Copper Catcher (+5% Bonus)</button>
+             <button id="cancel-capture-button" class="capture-wallet-button">Cancel</button>
+         </div>
+
+        <!-- Renamed inventory-view to wallet-view -->
+        <div id="wallet-view" class="game-view">
+            <div id="wallet-header"> <!-- Renamed header ID -->
+                 <span id="wallet-money">💰: 1000</span> <!-- Renamed money span ID -->
+                 <button id="recharge-ap-button" class="wallet-action-button">Recharge AP (Cost: 50)</button> <!-- Kept button IDs for now -->
+                 <button id="increase-max-ap-button" class="wallet-action-button">Increase Max AP (Cost: 200)</button>
+            </div>
+            <h2>Your Wallet</h2> <!-- Changed title -->
+            <div class="wallet-columns"> <!-- Added container for columns -->
+                <div class="wallet-column">
+                    <h3>Monsters</h3>
+                    <ul id="wallet-monster-list"></ul> <!-- Renamed monster list ID -->
+                </div>
+                <div class="wallet-column">
+                    <h3>Items</h3>
+                  <ul id="wallet-item-list"></ul> <!-- Added item list -->
+                 </div>
+             </div>
+             <button id="close-wallet-button">X</button> <!-- Renamed close button ID -->
+        </div>
+
+        <div id="switch-monster-view" class="game-view">
+             <h2>Switch Monster</h2>
+             <ul id="switch-monster-list"></ul>
+              <button id="cancel-switch-button">Cancel</button>
+         </div>
+
+        <!-- News Modal -->
+        <div id="news-modal" class="game-view">
+            <h2>Recent News Events</h2>
+            <ul id="news-list">
+                <!-- News items will be added here by JS -->
+            </ul>
+            <button id="close-news-modal-button">Close</button>
+        </div>
+
+        <!-- News Alert Overlay -->
+        <div id="news-alert-overlay" class="hidden">
+            <img id="news-alert-boss-img" src="" alt="Boss">
+            <p id="news-alert-effect"></p>
+         </div>
+
+     </div>
+     <script src="map.js"></script> <!-- Load map data first -->
+     <script src="game_state.js"></script>
+     <script src="exploration.js"></script>
+     <script src="battle.js"></script>
+     <script src="monsters.js"></script>
+     <script src="script.js"></script>
+ </body>
+ </html>
